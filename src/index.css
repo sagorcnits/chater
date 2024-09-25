@@ -19,4 +19,9 @@
   .user_chat {
     height: calc(100vh - 80px);
   }
+
+  .user_message {
+    height: calc(100vh - 120px);
+    padding: 20px 0;
+  }
 }
