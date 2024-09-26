@@ -1,20 +1,28 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAxios from "../../hooks/useAxios";
 
 const Login = () => {
   const axiosPublic = useAxios();
-
+  const navigate = useNavigate();
   const handleUser = (data) => {
     data.preventDefault();
     const email = data.target.email.value;
     const password = data.target.password.value;
     const userData = { email, password };
 
+    // console.log(userData)
+
     axiosPublic
-      .get("/api/users/users", userData)
+      .get("/api/users/users", {
+        params: userData,
+      })
       .then((res) => {
-        console.log(res.data);
+        console.log(res.data)
+        if (res.data.email) {
+          localStorage.setItem("user", JSON.stringify(res.data))
+          navigate("/chat-home");
+        }
       })
       .catch((error) => {
         console.log(error);
