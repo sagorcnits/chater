@@ -1,32 +1,63 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import useAxios from "../../hooks/useAxios";
 
 const Login = () => {
-  const handleUserName = (data) => {
-    data.preventDefault();
-    const userName = data.target.userName.value;
-    const userId = data.target.userId.value;
+  const axiosPublic = useAxios();
 
-    // localStorage.setItem("user", JSON.stringify({ userName, userId }));
+  const handleUser = (data) => {
+    data.preventDefault();
+    const email = data.target.email.value;
+    const password = data.target.password.value;
+    const userData = { email, password };
+
+    axiosPublic
+      .get("/api/users/users", userData)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
-    <form onSubmit={handleUserName} className="w-1/3 mx-auto mt-10">
-      <input
-        className="focus:outline-none border px-3 py-2"
-        type="text"
-        placeholder="userName"
-        name="userName"
-      />
-      <input
-        className="focus:outline-none border px-3 py-2"
-        type="text"
-        placeholder="userId"
-        name="userId"
-      />
-      <button type="submit" className="ml-3 px-3 py-2 cursor-pointer bg-green-400">
-        login
-      </button>
-    </form>
+    <div className="flex justify-center items-center h-screen">
+      <form onSubmit={handleUser} className="w-[400px] box-shadow mx-auto p-4">
+        <h1 className="font-bold text-center text-2xl">Sign in Your Account</h1>
+        <div className="mt-4">
+          <label className="font-bold">email :</label> <br />
+          <input
+            className="border focus:outline-none px-3 py-[7px] w-full"
+            type="email"
+            placeholder="email"
+            name="email"
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className="font-bold">password :</label> <br />
+          <input
+            className="border focus:outline-none px-3 py-[7px] w-full"
+            type="password"
+            placeholder="*****"
+            name="password"
+          />
+        </div>
+        <button
+          type="submit"
+          className="py-3 bg-green-500 text-white cursor-pointer w-full mt-4 font-semibold hover:bg-black duration-500"
+        >
+          Sign In
+        </button>
+        <p className="mt-2 text-center">
+          You Have Register an account?{" "}
+          <Link to="/register" className="text-green-500 font-semibold">
+            sign up
+          </Link>
+        </p>
+      </form>
+    </div>
   );
 };
 
