@@ -1,14 +1,22 @@
+import { useContext, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { AuthContext } from "../../components/AuthProvider";
 import useAllUser from "../../hooks/useAllUser";
 
 const Home = () => {
   const userData = useAllUser();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [users, setUsers] = useState([]);
+const {socket} = useContext(AuthContext)
+
+
+  console.log(socket);
 
   // console.log(userData);
   return (
     <>
       <main className="flex">
-        <section className="w-[25%] bg-[#2C2C2C] h-screen border-r border-[#222222] p-3">
+        <section className="w-full md:w-[25%] bg-[#2C2C2C] h-screen border-r border-[#222222] p-3">
           <div className="pb-4 px-2">
             <input
               type="text"
@@ -19,13 +27,14 @@ const Home = () => {
           <div className="user_chat overflow-auto px-2">
             {userData.map((item, id) => (
               <Link to={`/chat-home/chat-user/${item._id}`} key={id}>
-                <UserCard item={item} ></UserCard>
+                <div>
+                  <UserCard item={item}></UserCard>
+                </div>
               </Link>
             ))}
           </div>
         </section>
-
-        <section className="w-[75%] bg-[#2C2C2C] h-screen relative">
+        <section className="w-[75%] bg-[#2C2C2C] h-screen relative hidden md:block">
           <Outlet></Outlet>
         </section>
       </main>

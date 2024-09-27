@@ -18,10 +18,11 @@ const Login = () => {
         params: userData,
       })
       .then((res) => {
-        console.log(res.data)
+        console.log(res.data);
         if (res.data.email) {
-          localStorage.setItem("user", JSON.stringify(res.data))
+          localStorage.setItem("user", JSON.stringify(res.data));
           navigate("/chat-home");
+          
         }
       })
       .catch((error) => {
