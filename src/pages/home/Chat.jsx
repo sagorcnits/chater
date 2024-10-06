@@ -2,32 +2,34 @@ import React, { useContext, useEffect, useState } from "react";
 import { IoSendOutline } from "react-icons/io5";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../components/AuthProvider";
+import useAxios from "../../hooks/useAxios";
+
 const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [receviedMessages, setReceivedMessages] = useState([]);
- 
+  const axiosPublic = useAxios();
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  const userData = useLoaderData()[0];
+  const receiverData = useLoaderData()[0];
 
   const { socket } = useContext(AuthContext);
 
-  console.log(socket.id);
-  console.log(userData)
+  // console.log(socket.id);
+  // console.log(userData);
 
   useEffect(() => {
     socket.on(
       "receive-private-message",
       ({ senderId, message, receiverId }) => {
         setReceivedMessages((prevMessage) => [...prevMessage, message]);
-        console.log(message)
+        console.log(message);
       }
     );
 
     return () => {
-      socket.off("receive-private-message")
-    }
+      socket.off("receive-private-message");
+    };
   }, [socket]);
 
   const logout = () => {
@@ -38,25 +40,44 @@ const Chat = () => {
   const sendPrivateMessage = (data) => {
     data.preventDefault();
 
-    socket.emit("private-message", {
-      senderId: socket.id,
-      message: newMessage,
-      receiverId: userData.socketId,
-    });
-
-    setNewMessage(" ")
-
+    axiosPublic
+      .get(`/api/users/users/${receiverData._id}`)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data[0].socketId) {
+          socket.emit("private-message", {
+            senderId: socket.id,
+            message: newMessage,
+            receiverId: res.data[0].socketId,
+          });
+          axiosPublic
+            .post("/api/messages", {
+              senderId: user._id,
+              receiverId: receiverData._id,
+              message: newMessage,
+            })
+            .then((res) => {
+              console.log(res.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          setNewMessage(" ");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-  console.log(receviedMessages)
   return (
     <div>
       <nav className="px-3 py-2 border-b border-[#222222] flex justify-between items-center">
         <div className="flex gap-3 items-center">
           <div className="size-12 rounded-full overflow-hidden">
-            <img src={userData.photo_url} alt="user_img" />
+            <img src={receiverData.photo_url} alt="user_img" />
           </div>
-          <p className="font-bold text-white">{userData.name}</p>
+          <p className="font-bold text-white">{receiverData.name}</p>
         </div>
         <div className="flex items-center text-white gap-10">
           <p>{user?.name}</p>

@@ -1,18 +1,41 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { AuthContext } from "../../components/AuthProvider";
-import useAllUser from "../../hooks/useAllUser";
+import useAxios from "../../hooks/useAxios";
 
 const Home = () => {
-  const userData = useAllUser();
   const user = JSON.parse(localStorage.getItem("user"));
-  const [users, setUsers] = useState([]);
-  const {socket} = useContext(AuthContext)
+  const [userData, setUserData] = useState([]);
+  const { socket } = useContext(AuthContext);
 
+  const axiosPublic = useAxios();
+  // const [userData, setUserData] = useState([]);
 
-  // console.log(socket?.id);
+  // const {
+  //   refetch,
+  //   isPending,
+  //   error,
+  //   data
+  // } = useQuery({
+  //   queryKey: ["user"],
+  //   queryFn: async () => {
+  //     const users = await axiosPublic.get("/api/users/users");
+  //     return users.data;
+  //   },
+  // });
 
-  // console.log(userData);
+  useEffect(() => {
+    axiosPublic
+      .get("/api/users/users")
+      .then((res) => {
+        console.log(res.data);
+        setUserData(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <>
       <main className="flex">
