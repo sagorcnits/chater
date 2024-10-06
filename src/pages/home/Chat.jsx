@@ -14,6 +14,7 @@ const Chat = () => {
   const { socket } = useContext(AuthContext);
 
   console.log(socket.id);
+  console.log(userData)
 
   useEffect(() => {
     socket.on(
@@ -23,7 +24,6 @@ const Chat = () => {
         console.log(message)
       }
     );
-
 
     return () => {
       socket.off("receive-private-message")
@@ -41,7 +41,7 @@ const Chat = () => {
     socket.emit("private-message", {
       senderId: socket.id,
       message: newMessage,
-      receiverId: "avzO1QGjkNPFAJHwAAAB",
+      receiverId: userData.socketId,
     });
 
     setNewMessage(" ")

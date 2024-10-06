@@ -7,10 +7,10 @@ const Home = () => {
   const userData = useAllUser();
   const user = JSON.parse(localStorage.getItem("user"));
   const [users, setUsers] = useState([]);
-const {socket} = useContext(AuthContext)
+  const {socket} = useContext(AuthContext)
 
 
-  console.log(socket);
+  // console.log(socket?.id);
 
   // console.log(userData);
   return (

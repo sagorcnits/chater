@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../components/AuthProvider";
 import useAxios from "../../hooks/useAxios";
 
 const Login = () => {
   const axiosPublic = useAxios();
   const navigate = useNavigate();
+
+const {socket} = useContext(AuthContext)
+
+console.log(socket)
+
+
+
   const handleUser = (data) => {
     data.preventDefault();
     const email = data.target.email.value;
