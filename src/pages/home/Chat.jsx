@@ -26,11 +26,25 @@ const Chat = () => {
         console.log(message);
       }
     );
+    // console.log("ok", user._id, receiverData._id);
+    axiosPublic
+      .get("/api/messages", {
+        params: {
+          senderId: user._id,
+          receiverId: receiverData._id,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     return () => {
       socket.off("receive-private-message");
     };
-  }, [socket]);
+  }, [socket, receiverData]);
 
   const logout = () => {
     localStorage.removeItem("user");
