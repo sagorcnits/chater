@@ -19,9 +19,11 @@ const Chat = () => {
   useEffect(() => {
     socket.on(
       "receive-private-message",
-      ({ senderId, message, receiverId }) => {
-        setReceivedMessages((prevMessage) => [...prevMessage, { message }]);
-        console.log(message);
+      ({ senderId, messages, receiverId }) => {
+        setReceivedMessages((prevMessage) => [...prevMessage, messages
+
+        ]);
+        console.log(messages);
       }
     );
     // console.log("ok", user._id, receiverData._id);
@@ -59,9 +61,14 @@ const Chat = () => {
         if (res.data[0].socketId) {
           socket.emit("private-message", {
             senderId: socket.id,
-            message: newMessage,
+            messages: {
+              message: newMessage,
+              senderId: user._id,
+              receiverId: receiverData._id,
+            },
             receiverId: res.data[0].socketId,
           });
+
           axiosPublic
             .post("/api/messages", {
               senderId: user._id,
@@ -69,7 +76,7 @@ const Chat = () => {
               message: newMessage,
             })
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
             })
             .catch((error) => {
               console.log(error);
@@ -82,7 +89,7 @@ const Chat = () => {
       });
   };
 
-  console.log(receviedMessages);
+  // console.log(receviedMessages);
 
   return (
     <div>
@@ -103,15 +110,17 @@ const Chat = () => {
       <div className="user_message bg-[url('https://img.freepik.com/free-photo/simple-tree-sketch-falling-leaves_1379-348.jpg?t=st=1727168902~exp=1727172502~hmac=38dfee6df293a36e0a67d7325aaf7d9f5bd4099f97d05e37be6524f2463bf01e&w=740')] bg-no-repeat bg-cover px-8 overflow-auto">
         {receviedMessages.length > 0 &&
           receviedMessages.map((message, id) => {
+            // console.log(message);
             return (
-              <div
-                key={id}
-                className={`
-                  ${message.senderId === !user._id && ""}
-                 w-[300px] mt-2 ml-auto`}
-              >
-                <div className={`p-4 bg-[#005C4B]  rounded-md text-white `}>
-                  <p>{message.message}</p>
+              <div key={id}>
+                <div
+                  className={`p-4 bg-[#005C4B] w-[300px] mt-2 text-white text-center ${
+                    message?.senderId === user?._id
+                      ? "ml-auto  rounded-md"
+                      : "rounded-full"
+                  }`}
+                >
+                  <p>{message?.message}</p>
                 </div>
               </div>
             );
