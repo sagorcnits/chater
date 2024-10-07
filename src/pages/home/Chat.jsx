@@ -7,22 +7,20 @@ import useAxios from "../../hooks/useAxios";
 const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [receviedMessages, setReceivedMessages] = useState([]);
+  // const [saveMessages, setSaveMessages] = useState([])
   const axiosPublic = useAxios();
-
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
   const receiverData = useLoaderData()[0];
-
   const { socket } = useContext(AuthContext);
 
-  // console.log(socket.id);
-  // console.log(userData);
+  // get the user from localstorage
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     socket.on(
       "receive-private-message",
       ({ senderId, message, receiverId }) => {
-        setReceivedMessages((prevMessage) => [...prevMessage, message]);
+        setReceivedMessages((prevMessage) => [...prevMessage, { message }]);
         console.log(message);
       }
     );
@@ -35,7 +33,7 @@ const Chat = () => {
         },
       })
       .then((res) => {
-        console.log(res.data);
+        setReceivedMessages(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -84,6 +82,8 @@ const Chat = () => {
       });
   };
 
+  console.log(receviedMessages);
+
   return (
     <div>
       <nav className="px-3 py-2 border-b border-[#222222] flex justify-between items-center">
@@ -107,14 +107,11 @@ const Chat = () => {
               <div
                 key={id}
                 className={`
-                   ml-auto mt-2 "mt-2"
-                 w-[300px]`}
+                  ${message.senderId === !user._id && ""}
+                 w-[300px] mt-2 ml-auto`}
               >
-                <div>
-                  {/* <p className="text-white font-bold">{message.user}</p> */}
-                </div>
-                <div className="p-4 bg-[#005C4B] rounded-md text-white">
-                  <p>{message}</p>
+                <div className={`p-4 bg-[#005C4B]  rounded-md text-white `}>
+                  <p>{message.message}</p>
                 </div>
               </div>
             );
