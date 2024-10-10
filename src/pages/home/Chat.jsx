@@ -7,7 +7,6 @@ import useAxios from "../../hooks/useAxios";
 const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [receviedMessages, setReceivedMessages] = useState([]);
-  // const [saveMessages, setSaveMessages] = useState([])
   const axiosPublic = useAxios();
   const navigate = useNavigate();
   const receiverData = useLoaderData()[0];
@@ -16,17 +15,22 @@ const Chat = () => {
   // get the user from localstorage
   const user = JSON.parse(localStorage.getItem("user"));
 
+
+ 
+
   useEffect(() => {
     socket.on(
       "receive-private-message",
       ({ senderId, messages, receiverId }) => {
-        setReceivedMessages((prevMessage) => [...prevMessage, messages
-
-        ]);
+        setReceivedMessages((prevMessage) => [...prevMessage, messages]);
         console.log(messages);
       }
     );
     // console.log("ok", user._id, receiverData._id);
+   
+
+
+    // get the all message form database on this user
     axiosPublic
       .get("/api/messages", {
         params: {
@@ -44,15 +48,21 @@ const Chat = () => {
     return () => {
       socket.off("receive-private-message");
     };
-  }, [socket, receiverData]);
-
+  }, [receiverData]);
+  // logout user from localstorage
   const logout = () => {
     localStorage.removeItem("user");
     navigate("/");
   };
-
+  // sendPrivate message of the other user
   const sendPrivateMessage = (data) => {
     data.preventDefault();
+    const time = new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
 
     axiosPublic
       .get(`/api/users/users/${receiverData._id}`)
@@ -65,15 +75,17 @@ const Chat = () => {
               message: newMessage,
               senderId: user._id,
               receiverId: receiverData._id,
+              date: time,
             },
             receiverId: res.data[0].socketId,
           });
-
+          
           axiosPublic
             .post("/api/messages", {
               senderId: user._id,
               receiverId: receiverData._id,
               message: newMessage,
+              date: time,
             })
             .then((res) => {
               // console.log(res.data);
@@ -81,7 +93,7 @@ const Chat = () => {
             .catch((error) => {
               console.log(error);
             });
-          setNewMessage(" ");
+          setNewMessage("");
         }
       })
       .catch((err) => {
@@ -114,13 +126,14 @@ const Chat = () => {
             return (
               <div key={id}>
                 <div
-                  className={`p-4 bg-[#005C4B] w-[300px] mt-2 text-white text-center ${
-                    message?.senderId === user?._id
-                      ? "ml-auto  rounded-md"
-                      : "rounded-full"
+                  className={`px-4 py-2 bg-[#005C4B] w-[300px] mt-2 text-white rounded-md ${
+                    message?.senderId === user?._id ? "ml-auto" : ""
                   }`}
                 >
                   <p>{message?.message}</p>
+                  <p className="text-end text-sm text-gray-400">
+                    {message?.date}
+                  </p>
                 </div>
               </div>
             );
